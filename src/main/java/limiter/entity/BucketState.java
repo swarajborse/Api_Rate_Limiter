@@ -28,9 +28,6 @@ public class BucketState {
     @Column(nullable = false)
     public Instant lastRefillTime;
 
-    @Version
-    @Column
-    private Long version;
 
 
 

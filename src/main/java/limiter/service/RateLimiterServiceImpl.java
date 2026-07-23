@@ -41,8 +41,7 @@ public class RateLimiterServiceImpl implements RateLimiterService {
     @Override
     public RateLimitResponse checkRateLimit(RateLimitRequest request) {
 
-        final int MAX_RETRIES = 3;
-        int attempts = MAX_RETRIES;
+
 
         ClientConfiguration clientConfiguration =
                 clientConfigurationRepository.findByClientId(request.clientId())
@@ -50,9 +49,9 @@ public class RateLimiterServiceImpl implements RateLimiterService {
                                 new ClientConfigurationNotFoundException(
                                         "Configuration not found for client: " + request.clientId()));
 
-        while (attempts > 0) {
 
-            BucketState bucketState = bucketStateRepository.findByClientId(request.clientId())
+
+            BucketState bucketState = bucketStateRepository.findByClientIdForUpdate(request.clientId())
                     .orElseGet(() -> {
                         BucketState state = new BucketState();
                         state.setClientId(request.clientId());
@@ -70,7 +69,7 @@ public class RateLimiterServiceImpl implements RateLimiterService {
                     request
             );
 
-            try {
+
 
                 bucketStateRepository.save(result.getUpdatedBucketState());
 
@@ -80,19 +79,6 @@ public class RateLimiterServiceImpl implements RateLimiterService {
                         result.getRetryAfterSeconds()
                 );
 
-            } catch (OptimisticLockingFailureException ex) {
-
-                attempts--;
-
-                if (attempts == 0) {
-                    throw new IllegalStateException(
-                            "Failed to process request after " + MAX_RETRIES + " retries", ex);
-                }
-
-            }
-        }
-
-        throw new IllegalStateException("Unexpected execution path");
     }
 
 }
