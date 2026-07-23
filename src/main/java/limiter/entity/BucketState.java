@@ -7,6 +7,7 @@ import lombok.Data;
 import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.UUID;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "bucket_state")
@@ -26,6 +27,10 @@ public class BucketState {
 
     @Column(nullable = false)
     public Instant lastRefillTime;
+
+    @Version
+    @Column
+    private Long version;
 
 
 
