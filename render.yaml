@@ -1,0 +1,45 @@
+resources:
+  - name: rate-limiter-db
+    type: postgresql
+    plan: free
+    databaseName: rate_limiter
+
+  - name: rate-limiter-api
+    type: web
+    runtime: docker
+    plan: starter
+    rootDir: rate
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_URL
+        fromDatabase:
+          name: rate-limiter-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: rate-limiter-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: rate-limiter-db
+          property: password
+      - key: REDIS_HOST
+        sync: false
+        description: "Your Upstash Redis host (e.g. redis-xxxx.upstash.io)"
+      - key: REDIS_PORT
+        value: 6379
+      - key: REDIS_PASSWORD
+        sync: false
+        description: "Your Upstash Redis password"
+
+  - name: rate-limiter-dashboard
+    type: static_site
+    rootDir: frontend
+    staticPublishPath: ./dist
+    buildCommand: npm install && npm run build
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          name: rate-limiter-api
+          type: web
+          property: url
