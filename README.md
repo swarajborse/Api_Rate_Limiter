@@ -1,4 +1,4 @@
-# 🚀 Distributed API Rate Limiter
+#  Distributed API Rate Limiter
 
 A production-oriented distributed API Rate Limiter built with **Java 17, Spring Boot, PostgreSQL, Redis, and Redis Lua Scripting**. Instead of relying on existing rate-limiting libraries, this project implements the complete Token Bucket algorithm from scratch, evolving from a database-backed implementation to an atomic Redis Lua solution capable of handling concurrent requests safely.
 
